@@ -14,13 +14,13 @@ from cython.parallel import prange
 
 cdef class NearestNeighbor:
     
-    cdef int Xtr
-    cdef int[:] ytr
+    cdef double[:,:] Xtr
+    cdef long[:] ytr
 
     def __init__(self):
         pass
 
-    def train(self, int X, np.ndarray[int, ndim=1] y):
+    def train(self, np.ndarray[double, ndim=2] X, np.ndarray[long, ndim=1] y):
         """ X is N x D where each row is an example. Y is 1-dimension of size N """
         # the nearest neighbor classifier simply remembers all the training data
         self.Xtr = X
@@ -31,31 +31,43 @@ cdef class NearestNeighbor:
     cpdef np.ndarray[int,ndim=1] predict(self, X):
         """ X is N x D where each row is an example we wish to predict label for """
         cdef int num_test = X.shape[0]
+
         # lets make sure that the output type matches the input type
-        cdef np.ndarray[int,ndim=1] Ypred = np.empty(num_test, dtype = self.ytr.dtype)
+        cdef np.ndarray[long,ndim=1] Ypred = np.empty(num_test, dtype = np.int)
         cdef int i
         # loop over all test rows
-        for i in xrange(num_test):
-            if i%1000 == 0:
+
+        for i in prange(num_test, nogil=True, schedule='dynamic'):
+            with gil:
+                #if i%1000 == 0:
                 print i, num_test
-            # find the nearest training image to the i'th test image
-            # using the L1 distance (sum of absolute value differences)
-            distances = np.sum(np.abs(self.Xtr - X[i,:]), axis = 1)
-            min_index = np.argmin(distances) # get the index with smallest distance
-            Ypred[i] = self.ytr[min_index] # predict the label of the nearest example
+                # find the nearest training image to the i'th test image
+                # using the L1 distance (sum of absolute value differences)
+                distances = np.sum(np.abs(self.Xtr - X[i]), axis = 1)
+                min_index = np.argmin(distances) # get the index with smallest distance
+                Ypred[i] = self.ytr[min_index] # predict the label of the nearest example
 
         return Ypred
 
-def classify():
-    Xtr, Ytr, Xte, Yte = load_CIFAR10('/home/paulo/Downloads/cifar-10-batches-py/')
 
+def classify():
+    print "0"
+    Xtr, Ytr, Xte, Yte = load_CIFAR10('/home/phamorim/Downloads/cifar-10-batches-py/')
+    print "1"
     # flatten out all images to be one-dimensional
     Xtr_rows = Xtr.reshape(Xtr.shape[0], 32 * 32 * 3) # Xtr_rows becomes 50000 x 3072
     Xte_rows = Xte.reshape(Xte.shape[0], 32 * 32 * 3) # Xte_rows becomes 10000 x 3072
-
+    print "2"
     nn = NearestNeighbor() # create a Nearest Neighbor classifier class
+    print "3"
     nn.train(Xtr_rows, Ytr) # train the classifier on the training images and labels
+    print "4"
     nn.predict(Xte_rows) # predict labels on the test images
+    print "5"
     # and now print the classification accuracy, which is the average number
     # of examples that are correctly predicted (i.e. label matches)
     #print 'accuracy: %f' % ( np.mean(Yte_predict == Yte) )
+
+
+if __name__ == "__main__":
+    classify()
