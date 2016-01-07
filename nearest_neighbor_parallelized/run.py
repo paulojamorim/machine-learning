@@ -1,0 +1,3 @@
+import nearest_neighbor_parallelized
+
+nearest_neighbor_parallelized.classify()
