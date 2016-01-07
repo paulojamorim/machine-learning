@@ -59,7 +59,3 @@ def classify():
     # and now print the classification accuracy, which is the average number
     # of examples that are correctly predicted (i.e. label matches)
     #print 'accuracy: %f' % ( np.mean(Yte_predict == Yte) )
-
-
-if __name__ == "__main__":
-    classify()

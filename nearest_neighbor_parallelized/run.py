@@ -1,3 +1,4 @@
 import nearest_neighbor_parallelized
 
-nearest_neighbor_parallelized.classify()
+if __name__ == "__main__":
+    nearest_neighbor_parallelized.classify()
