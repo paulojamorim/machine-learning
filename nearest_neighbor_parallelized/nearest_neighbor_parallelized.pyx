@@ -50,10 +50,10 @@ cdef class NearestNeighbor:
         return Ypred
 
 
-def classify():
+def classify(path):
     cdef long[:] Yte_predict 
 
-    Xtr, Ytr, Xte, Yte = load_CIFAR10('/home/phamorim/Downloads/cifar-10-batches-py/')
+    Xtr, Ytr, Xte, Yte = load_CIFAR10(path)
     # flatten out all images to be one-dimensional
     Xtr_rows = Xtr.reshape(Xtr.shape[0], 32 * 32 * 3) # Xtr_rows becomes 50000 x 3072
     Xte_rows = Xte.reshape(Xte.shape[0], 32 * 32 * 3) # Xte_rows becomes 10000 x 3072
