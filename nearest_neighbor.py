@@ -1,7 +1,7 @@
 # --- Stanford course CS231N ----
-#  http://cs231n.github.io/
 
 import numpy as np
+import sys
 
 from utils import load_CIFAR10 
 
@@ -32,8 +32,8 @@ class NearestNeighbor:
 
         return Ypred
 
-def classify():
-    Xtr, Ytr, Xte, Yte = load_CIFAR10('/home/paulo/Downloads/cifar-10-batches-py/')
+def classify(path):
+    Xtr, Ytr, Xte, Yte = load_CIFAR10(path)
 
     # flatten out all images to be one-dimensional
     Xtr_rows = Xtr.reshape(Xtr.shape[0], 32 * 32 * 3) # Xtr_rows becomes 50000 x 3072
@@ -48,4 +48,5 @@ def classify():
 
 
 if __name__ == "__main__":
-    classify()
+    path = sys.argv[1] 
+    classify(path)
